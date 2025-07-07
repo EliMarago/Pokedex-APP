@@ -16,6 +16,8 @@ const colors = {
   fighting: "#E6E0D4",
   normal: "#F5F5F5",
 };
+
+const main_type = Object.keys(colors);
 const fetchPokemons = async function () {
   for (let i = 1; i <= pokemon_count; i++) {
     await getPokemon(i);
@@ -30,9 +32,35 @@ const getPokemon = async function (id) {
       throw new Error(`Pokemon con id ${id} non trovato (${res.status})`);
     }
     const data = await res.json();
-    console.log(data);
+    createPokemonCard(data);
   } catch (error) {
     console.log(error.message);
   }
+};
+const createPokemonCard = (pokemon) => {
+  const pokemonEl = document.createElement("div");
+  pokemonEl.classList.add("pokemon");
+
+  const name = pokemon.name[0].toUpperCase() + pokemon.name.slice(1);
+  const id = pokemon.id.toString().padStart(3, "0");
+  const poke_types = pokemon.types.map((type) => type.type.name);
+  const type = main_type.find((type) => poke_types.indexOf(type) > -1);
+  const color = colors[type];
+  pokemonEl.style.backgroundColor = color;
+
+  const pokemonInnerHTML = `
+   <div class="img-container">
+  <img
+    src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png"
+    alt="Bulbasaur pokemon"
+  />
+</div>
+<div class="info">
+  <span class="number">#${id}</span>
+  <h3 class="name">${name}</h3>
+  <small class="type">Type: <span>${type}</span></small>
+</div>`;
+  pokemonEl.innerHTML = pokemonInnerHTML;
+  poke_container.appendChild(pokemonEl);
 };
 fetchPokemons();
